@@ -1,0 +1,9 @@
+### AI response generation endpoint: write effective prompts and handle responses (generate shorter responses
+POST http://localhost:3000/api/ai/generate
+Content-Type: application/json
+
+{
+  "prompt": `Write step-by-step instructions to set up a local AI development environment 
+             using Node.js, including installing necessary packages and creating a simple Express server.
+             Just write the steps without any explanations. Make the response concise and to the point.`
+}
