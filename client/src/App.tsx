@@ -2,6 +2,7 @@ import { useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 import Layout from "./layout/Layout";
+import { Send } from "lucide-react";
 
 function App() {
   const [userInput, setUserInput] = useState<string>("");
@@ -21,12 +22,20 @@ function App() {
           // targetLang: "ne",
         }), // Example payload
       });
-      const data = await response.json();
-      const htmlResponse = await marked.parse(data.response);
-      const sanitizedHtml = DOMPurify.sanitize(htmlResponse);
-      setMessages((prevMessages) => [...prevMessages, sanitizedHtml]);
-
-      console.log("Response from server:", sanitizedHtml);
+      console.log("response", response);
+      // const data = await response.json();
+      const reader = response.body?.getReader(); // getReader reads the response stream, allowing you to process the data as it arrives in chunks, which is useful for handling large responses or streaming data from the server.
+      const decoder = new TextDecoder("utf-8"); // TextDecoder is used to decode the binary data chunks into readable text format, enabling you to display the AI's response incrementally as it is received from the server.
+      let result = "";
+      while (true) {
+        const { done, value } = await reader!.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        result += chunk;
+        const parsedMessage = await marked.parse(result);
+        const sanitizedMessage = DOMPurify.sanitize(parsedMessage);
+        setMessages((prev) => [...prev.slice(0, -1), sanitizedMessage]);
+      }
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -37,11 +46,11 @@ function App() {
       <Layout>
         <div className="App pb-4 space-y-4 p-4 flex flex-col items-center gap-4 h-screen relative">
           {/* Message container */}
-          <div className="w-full max-sm:p-4 flex flex-col gap-2">
+          <div className="w-full pt-4 pb-28 flex flex-col gap-2">
             {messages.map((message, index) => (
               <div
                 key={index}
-                className="flex items-start justify-start text-start overflow-auto p-4 bg-gray-100 rounded border border-gray-300 w-full"
+                className="flex flex-col space-y-2 items-start justify-start text-start overflow-auto p-4 bg-gray-100 rounded border border-gray-300 w-full"
                 dangerouslySetInnerHTML={{ __html: message }}
               />
             ))}
@@ -49,34 +58,23 @@ function App() {
 
           {/* Message input area */}
           <div className="w-full max-w-md max-sm:p-4 flex gap-2 items-center justify-center fixed bottom-4">
-            <textarea
-              id="messageInput"
-              rows={1}
-              placeholder="Enter your message here"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              className={`min-h-10 w-full p-2 box-border border rounded border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base leading-6 focus:text-white focus:bg-gray-700 scrollbar-none`}
-            />
-            <div className="relative">
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 absolute right-0 top-1/2 transform -translate-y-1/2"
-                onClick={sendMessage}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6 "
+            <div className="flex gap-2 w-full items-center justify-center flex-row">
+              <textarea
+                id="messageInput"
+                rows={3}
+                placeholder="Enter your message here"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                className={`min-h-10  max-h-20 flex-2/3 bg-white w-full p-3 box-border border rounded border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base leading-6 focus:text-white focus:bg-gray-700 scrollbar-none`}
+              />
+              <div className="z-10 backdrop:blur-sm bg-black/50 rounded gap-2 flex items-end">
+                <button
+                  className="bg-blue-500 h-10 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onClick={sendMessage}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                  />
-                </svg>
-              </button>
+                  <Send className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
