@@ -56,3 +56,31 @@ export const generateResponse = async (req, res) => {
       .json({ error: "An error occurred while generating the response." });
   }
 };
+
+export const translateLanguage = async (req, res) => {
+  try {
+    const { prompt, targetLang } = req.body;
+    const messages = [
+      {
+        role: "system",
+        content: `You are a helpful assistant that translates text into ${targetLang}.`,
+      },
+      {
+        role: "user",
+        content: `${prompt}`,
+      },
+    ];
+    const response = await client.chat.completions.create({
+      model: process.env.OPENAI_MODEL,
+      messages,
+      max_tokens: 100,
+    });
+    const translatedMessage = response.choices[0].message;
+    res.json({ response: translatedMessage.content });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while translating the language." });
+  }
+};
