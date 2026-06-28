@@ -241,3 +241,54 @@ const response = await client.responses.create({
 ```
 
 - system prompts and language we use in the instructions can affect the model's behavior and the quality of the generated responses. By providing clear and specific instructions in the system prompt, you can guide the model towards generating responses that are more relevant and accurate based on the user's query. Additionally, using appropriate language and phrasing in the instructions can help ensure that the model understands the context and intent of the request, leading to better overall performance and user experience.
+
+
+
+Make me a prompt for a song about kids & babies as given below but in a different topic & different theme. 
+The song should be about kids & babies but in a different topic & different theme. The song should be fun, catchy, and suitable for children. It should have a playful and imaginative tone, with lyrics that are easy to sing along to. The song should also include a chorus that is repeated throughout the song, and it should have a positive and uplifting message. The song should be written in a way that encourages creativity and imagination in children, and it should be appropriate for all ages. 
+
+Oh oh oh oh oh oh      
+One little, two little, three little babies    
+Four little, five little, six little babies    
+Seven little, eight little, nine little babies    
+Ten babies feeling sick      
+
+Sick babies, cry babies    
+Oh oh oh oh oh oh oh oh Poor babies    
+Sick babies, cry babies    
+Oh oh oh oh oh oh oh oh Poor babies   
+Sick babies, cry babies    
+I'll take care of you!    
+
+One little hug for a poor sick baby   
+Two little blankets keep them cozy   
+Three little kisses make them happy   
+Babies, babies, I'm right here   
+
+Four little spoons of “magical” soup   
+Five little songs with happy tunes   
+Six little books before bedtime    
+Babies, babies, get well soon    
+
+Seven little stars twinkling all night   
+Eight little smiles make them sleep tight  
+Nine little whispers      
+saying, “Night-night”     
+Ten babies feeling fine     
+
+One little, two little, three little babies   
+Four little ,five little, six little babies   
+Seven little, eight little, nine little babies   
+Ten babies taking care of you.    
+
+One two three four five six seven eight nine ten   
+Oh oh oh oh oh oh    
+Silly babies, cute babies   
+Oh oh oh oh oh oh taking care of you   
+Silly babies, cute babies   
+Oh oh oh oh oh oh taking care of you 
+Silly babies, cute babies   
+Babies taking care of you!  
+
+One two three four five six seven eight nine ten    
+Ten babies taking care of you
