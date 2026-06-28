@@ -11,14 +11,19 @@ export const generateResponse = async (req, res) => {
       // system message to set the context and behavior of the assistant
       {
         role: "system",
-        content:
-          "You are a helpful assistant that provides concise and relevant responses to user prompts. Skip intros and get straight to the point.",
-      },
-      {
-        role: "user",
         content: `Write step-by-step instructions to set up a local AI development environment 
              using Node.js, including installing necessary packages and creating a simple Express server.
              Just write the steps without any explanations. Make the response concise and to the point.`,
+      },
+      {
+        role: "user",
+        content: `${prompt}`,
+      },
+      {
+        role: "assistant",
+        content: `Sure! Here are the steps to set up a local AI development environment using Node.js:
+1. Install Node.js: Download and install Node.js from the official website (https://nodejs.org/).
+2. Create a new project directory: Open your terminal and run "mkdir ai-dev-environment && cd ai-dev-environment".`,
       },
     ];
     const firstResponse = await client.chat.completions.create({

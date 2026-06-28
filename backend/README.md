@@ -77,3 +77,167 @@
 - To enforce a specific structure in the AI's response, you can use prompt engineering techniques to guide the model towards generating responses in the desired format. This can include providing clear instructions in the prompt, using examples of the expected response format, and specifying any constraints or requirements for the response. Additionally, you can implement follow-up interactions by including previous conversation history in the prompt, allowing the model to maintain context and generate more coherent responses based on the ongoing conversation. This can help ensure that the AI's responses are structured and relevant to the user's needs while also allowing for dynamic interactions and follow-ups as needed.
 
 - making the ai context-aware or context-sensitive: To make the AI context-aware, you can include relevant information in the prompt that provides context for the model to generate more accurate and relevant responses. This can involve including previous conversation history, user preferences, or any other relevant data that can help the model understand the context of the interaction. By providing this context, you can improve the quality of the AI's responses and make them more tailored to the user's needs and preferences. Additionally, you can use techniques such as fine-tuning or few-shot learning to further enhance the model's ability to understand and respond to specific contexts or domains.
+
+## few-shot prompting
+
+- few shot prompting: Few-shot prompting is a technique where you provide the language model with a few examples of the desired output format or structure in the prompt. This helps guide the model towards generating responses that follow the same pattern or format as the examples provided. By including a few examples in the prompt, you can improve the likelihood of the model generating responses that are consistent with the desired structure, making it easier to enforce specific formats or requirements in the AI's responses. also known as multi-shot prompting or example-based prompting, is a powerful technique for guiding language models to produce more accurate and relevant responses by providing them with a few examples of the desired output format or structure in the prompt. This approach can be particularly effective when you want to enforce specific formats or requirements in the AI's responses, as it helps the model understand the expected output and generate responses that are consistent with the provided examples.
+- few shot prompting increases the input tokens which can lead to hitting the context window limit of the model, more processing & slightly higher latency, and increased costs due to more tokens being processed. It's important to balance the number of examples provided in few-shot prompting with the token limits and performance considerations of the model being used.
+
+## Temperature
+
+- Temperature is a parameter that controls the randomness of the AI's responses. A higher temperature (e.g., 0.8) will result in more creative and diverse responses, while a lower temperature (e.g., 0.2) will produce more focused and deterministic responses. Adjusting the temperature can help you achieve the desired level of creativity or specificity in the AI's responses based on your use case. For example, if you want the AI to generate more creative content, you might set a higher temperature, while if you want more precise and consistent responses, you would set a lower temperature. It's important to experiment with different temperature settings to find the right balance for your specific application and desired output.
+- every time model generates text, it evaluates the probabilities of the next token based on the context and the temperature setting. A higher temperature allows for more randomness in token selection, while a lower temperature makes the model more deterministic in choosing the most likely next token. This can affect the creativity and diversity of the generated responses, with higher temperatures leading to more varied outputs and lower temperatures resulting in more focused and consistent responses. Adjusting the temperature can help you achieve the desired level of creativity or specificity in the AI's responses based on your use case.
+
+## Why models don't remember
+
+- Language models do not have built-in memory of past interactions or conversations. Each API call is treated as a standalone request, and the model generates a response based solely on the input provided in that specific call. To maintain a conversation or context across multiple interactions, you need to include the conversation history (messages array) in each API call. This allows the model to generate responses based on the cumulative context of the conversation, but it does not have any inherent memory of past interactions outside of what is provided in the current API call.
+
+## top-p (nucleus sampling)
+
+- top_p makes the model more selective in choosing the next token by limiting the token selection to a subset of the most probable tokens, than making the model bolder
+- Top-p, also known as nucleus sampling, is a parameter that controls the diversity of the AI's responses by limiting the token selection to a subset of the most probable tokens. When generating a response, the model calculates the probabilities of all possible next tokens and selects from the smallest set of tokens whose cumulative probability exceeds the top-p threshold. This allows for more focused and coherent responses while still providing some level of creativity and variability. Adjusting the top-p value can help you achieve the desired balance between coherence and diversity in the AI's responses based on your specific use case and requirements.
+
+- the model always has many possible next words, where some are very likely and others are less likely. By setting a top-p value, you can limit the token selection to a subset of the most probable tokens, which can help improve the coherence and relevance of the generated responses while still allowing for some level of creativity and variability.
+- top-p limits how wide a slice those possibilities the model is allowed to consider.
+  - top_p: 1.0, default value, means the model considers all possible tokens, allowing for maximum diversity in the responses.
+  - top_p: 0.9, means the model will only consider the smallest set of tokens whose cumulative probability exceeds 0.9, which can help improve the coherence and relevance of the generated responses while still allowing for some level of creativity and variability.
+  - top_p: 0.5, means the model will only consider the smallest set of tokens whose cumulative probability exceeds 0.5, which can result in more focused and deterministic responses, but may also reduce the diversity and creativity of the generated output.
+- This is particularly useful when you want to ensure that the AI's responses are focused and relevant to the context of the conversation while still providing some degree of diversity in the output. Adjusting the top-p value can help you find the right balance between coherence and creativity in the AI's responses based on your specific use case and requirements.
+
+- in real production systems, engineers rarely touch these parameters once things are stable.
+- they are usually tuned in early, then left alone. extreme values are never used.
+- don't aggressively tune temperature or top-p, as it can lead to unpredictable results. Instead, start with default values and make small adjustments if necessary based on the specific requirements of your application and the desired output from the AI model.
+- adjust temperature only if you want to make the model more creative or more focused, and adjust top-p if you want to control the diversity of the responses while maintaining coherence and relevance to the context of the conversation. It's important to experiment with these parameters in a controlled manner to find the right balance for your specific use case and desired output from the AI model.
+- most app live near defaults or slightly below these defaults, as they provide a good balance between creativity and coherence for most applications. Extreme values can lead to unpredictable or undesirable results, so it's generally recommended to start with default settings and make small adjustments as needed based on the specific requirements of your application and the desired output from the AI model.
+
+## Responses API
+
+- The Responses API is a powerful tool that allows you to generate responses from the AI model based on user input and conversation history. It provides a flexible and customizable way to interact with the model, allowing you to specify parameters such as temperature, top-p, and max tokens to control the behavior of the generated responses. By using the Responses API, you can create dynamic and engaging interactions with the AI model, enabling a wide range of applications such as chatbots, virtual assistants, and content generation tools.
+
+```js
+const response = await client.responses.create({
+  model: "gpt-4o-mini",
+  // input: "Hello! How can I assist you today?",
+  temperature: 0.7,
+  top_p: 0.9,
+  max_tokens: 150,
+  input: [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: "Can you provide a summary of the latest news?" },
+  ],
+});
+```
+
+- JSON output: using different provider or model may return different JSON Structure, so it's important to refer to the specific documentation for the provider or model you are using to understand the expected output format and how to handle it in your application. This will ensure that you can effectively parse and utilize the generated responses from the AI model in your application.
+- we can use the `response.output_text` property to get the generated text from the AI model, which can then be displayed in the frontend application or used for further processing. This allows you to easily access and utilize the generated responses from the AI model in your application, enabling dynamic and engaging interactions with users.
+- we can use stronger models to output json data, which can be useful for structured data generation or when you need the AI model to provide responses in a specific format. By specifying the desired output format in the prompt or using few-shot prompting techniques, you can guide the model to generate responses that adhere to the required structure, making it easier to parse and utilize the generated data in your application.
+
+### setting response format (to get structured data as JSON output)
+
+```js
+// response_format = schema
+const schema = {
+  type: "json_schema",
+  json_schema: {
+    name: "gift_suggestions",
+    schema: {
+      type: "object",
+      properties: {
+        gifts: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              price_range: { type: "string" },
+              why_its_good: { type: "string" },
+            },
+            required: ["name", "price_range", "why_its_good"],
+          },
+        },
+      },
+      required: ["gifts"],
+    },
+  },
+};
+
+const response = await client.chat.completions.create({
+  model: "gpt-4o-mini",
+  temperature: 0.7,
+  top_p: 0.9,
+  max_tokens: 150,
+  input: [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: "Can you provide a summary of the latest news?" },
+  ],
+  response_format: schema,
+});
+```
+
+```js
+// for responses api
+const schemaResponse = {
+  type: "json_schema",
+  name: "gift_suggestions",
+  schema: {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      gifts: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            name: { type: "string" },
+            price_range: { type: "string" },
+            why_its_good: { type: "string" },
+          },
+          required: ["name", "price_range", "why_its_good"],
+        },
+      },
+    },
+    required: ["gifts"],
+  },
+};
+
+const response = await client.responses.create({
+  model: "gpt-4o-mini",
+  temperature: 0.7,
+  top_p: 0.9,
+  max_tokens: 150,
+  input: [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: "Can you provide a summary of the latest news?" },
+  ],
+  text: {
+    format: schemaResponse,
+  },
+});
+```
+
+# Web search tool
+
+- Language models do not have real-time access to the internet or external databases, so they cannot perform web searches or retrieve current information. If you need to provide up-to-date information in your responses, you would need to implement a separate web search functionality and integrate it with the language model to fetch the latest data before generating a response. This can involve using APIs from search engines or other data sources to retrieve relevant information based on user queries, which can then be included in the prompt for the language model to generate a response that incorporates the most current and accurate information available.
+
+```js
+const response = await client.responses.create({
+  model: "gpt-4o-mini",
+  temperature: 0.7,
+  top_p: 0.9,
+  max_tokens: 150,
+  input: [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: "Can you provide a summary of the latest news?" },
+  ],
+
+  tools: [
+    {
+      // type: "web_search",
+      type: "web_search_preview",
+    },
+  ],
+});
+```
+
+- system prompts and language we use in the instructions can affect the model's behavior and the quality of the generated responses. By providing clear and specific instructions in the system prompt, you can guide the model towards generating responses that are more relevant and accurate based on the user's query. Additionally, using appropriate language and phrasing in the instructions can help ensure that the model understands the context and intent of the request, leading to better overall performance and user experience.
